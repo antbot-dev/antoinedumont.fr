@@ -3,7 +3,6 @@ import {
   ArrowUpRight,
   Bot,
   Calendar,
-  CheckCircle2,
   Code2,
   ExternalLink,
   FileText,
@@ -11,7 +10,10 @@ import {
   Linkedin,
   Mail,
   MapPin,
+  MessageCircle,
+  Play,
   Rocket,
+  Send,
   ShieldCheck,
   Sparkles,
   Target,
@@ -54,9 +56,10 @@ type Project = {
 
 const navItems = [
   { label: 'Profile', href: '#profile' },
-  { label: 'AI', href: '#ai' },
-  { label: 'Experience', href: '#experience' },
   { label: 'Skills', href: '#skills' },
+  { label: 'AI', href: '#ai' },
+  { label: 'Education', href: '#education' },
+  { label: 'Experience', href: '#experience' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -198,6 +201,8 @@ const education = [
   },
 ];
 
+const waveformHeights = [9, 13, 20, 16, 26, 22, 30, 18, 15, 11, 22, 26, 19, 14, 10, 18, 25, 21, 16, 12, 8, 14, 22, 18, 12, 15, 24, 18, 11, 8];
+
 function App() {
   return (
     <div className="site-shell">
@@ -322,7 +327,7 @@ function App() {
           ))}
         </section>
 
-        <section className="section-band selected-work-section">
+        <section className="section-band">
           <div className="section-heading">
             <p className="section-kicker">Current focus</p>
             <h2>GTM leadership, practical AI building, and pipeline execution.</h2>
@@ -339,60 +344,6 @@ function App() {
                 </article>
               );
             })}
-          </div>
-        </section>
-
-        <section className="split-section antbot-section" id="ai">
-          <div className="section-heading compact">
-            <p className="section-kicker">AntBot.dev</p>
-            <h2>AntBot is a working example of what I build.</h2>
-            <p>
-              The podcast product creates a personalized 5-minute AI audio briefing every morning in WhatsApp. It combines source monitoring, agent workflows, verification, messaging, and text-to-speech into a real user-facing experience.
-            </p>
-          </div>
-
-          <div className="ai-capabilities">
-            {[
-              'Personalized AI podcast delivered in WhatsApp',
-              'Source monitoring, synthesis, verification, and TTS',
-              'OpenClaw-powered agent workflows and scheduled jobs',
-              'Messaging interface designed for daily adoption',
-              'Dedicated runtime with health checks and recovery',
-              'A practical bridge between AI experimentation and GTM use cases',
-            ].map((capability) => (
-              <div className="capability-row" key={capability}>
-                <CheckCircle2 aria-hidden="true" />
-                <span>{capability}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section-band" id="experience">
-          <div className="section-heading">
-            <p className="section-kicker">CV timeline</p>
-            <h2>From digital acquisition to SaaS growth and AI-era marketing.</h2>
-          </div>
-
-          <div className="timeline">
-            {experiences.map((item) => (
-              <article className="timeline-item" key={`${item.company}-${item.period}`}>
-                <div className="timeline-meta">
-                  <Calendar aria-hidden="true" />
-                  <span>{item.period}</span>
-                </div>
-                <div className="timeline-content">
-                  <h3>{item.role}</h3>
-                  <p className="company">{item.company}</p>
-                  <p>{item.summary}</p>
-                  <ul>
-                    {item.bullets.map((bullet) => (
-                      <li key={bullet}>{bullet}</li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
-            ))}
           </div>
         </section>
 
@@ -420,7 +371,74 @@ function App() {
           </div>
         </section>
 
-        <section className="section-band">
+        <section className="split-section antbot-section" id="ai">
+          <div className="section-heading compact">
+            <p className="section-kicker">AntBot.dev</p>
+            <h2>AntBot is a working example of what I build.</h2>
+            <p>
+              The podcast product creates a personalized 5-minute AI audio briefing every morning in WhatsApp. It combines source monitoring, agent workflows, verification, messaging, and text-to-speech into a real user-facing experience.
+            </p>
+          </div>
+
+          <div className="podcast-demo" aria-label="AntBot Podcast WhatsApp preview">
+            <div className="podcast-phone">
+              <div className="podcast-header">
+                <div className="whatsapp-mark" aria-hidden="true">
+                  <MessageCircle />
+                </div>
+                <div>
+                  <strong>AntBot Podcast</strong>
+                  <span>en ligne</span>
+                </div>
+              </div>
+
+              <div className="podcast-body">
+                <span className="podcast-date">Aujourd'hui</span>
+
+                <div className="podcast-bubble bot podcast-delay-1">
+                  <strong>Bonjour !</strong> Ton briefing IA & Tech est prêt.
+                  <span>7:30</span>
+                </div>
+
+                <div className="podcast-audio podcast-delay-2">
+                  <button type="button" aria-label="Play AntBot podcast preview">
+                    <Play aria-hidden="true" />
+                  </button>
+                  <div className="podcast-audio-content">
+                    <div className="waveform" aria-hidden="true">
+                      {waveformHeights.map((height, index) => (
+                        <span
+                          key={`${height}-${index}`}
+                          style={{ height: `${height}px`, animationDelay: `${index * 0.055}s` }}
+                        />
+                      ))}
+                    </div>
+                    <small>IA & Tech - 5 min</small>
+                  </div>
+                </div>
+
+                <div className="podcast-bubble bot podcast-delay-3">
+                  <em>Agents IA - GTM workflows - WhatsApp automation</em>
+                  <span>7:30</span>
+                </div>
+
+                <div className="podcast-bubble user podcast-delay-4">
+                  Super merci 🔥
+                  <span>7:42</span>
+                </div>
+              </div>
+
+              <div className="podcast-input">
+                <span>Écrire un message</span>
+                <button type="button" aria-label="Send message">
+                  <Send aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section-band selected-work-section">
           <div className="section-heading">
             <p className="section-kicker">Selected work</p>
             <h2>Projects that show the mix of growth, systems, and execution.</h2>
@@ -443,7 +461,7 @@ function App() {
           </div>
         </section>
 
-        <section className="education-section">
+        <section className="education-section" id="education">
           <div className="section-heading compact">
             <p className="section-kicker">Education</p>
             <h2>Engineering plus business training.</h2>
@@ -458,6 +476,34 @@ function App() {
                   <p>{item.detail}</p>
                 </div>
                 <span>{item.period}</span>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-band" id="experience">
+          <div className="section-heading">
+            <p className="section-kicker">CV timeline</p>
+            <h2>From digital acquisition to SaaS growth and AI-era marketing.</h2>
+          </div>
+
+          <div className="timeline">
+            {experiences.map((item) => (
+              <article className="timeline-item" key={`${item.company}-${item.period}`}>
+                <div className="timeline-meta">
+                  <Calendar aria-hidden="true" />
+                  <span>{item.period}</span>
+                </div>
+                <div className="timeline-content">
+                  <h3>{item.role}</h3>
+                  <p className="company">{item.company}</p>
+                  <p>{item.summary}</p>
+                  <ul>
+                    {item.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </div>
               </article>
             ))}
           </div>
