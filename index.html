@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-accent="nuit">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +9,7 @@
       content="Antoine Dumont - Paris-based Head of Marketing & Applied AI. B2B SaaS pipeline, GTM systems, and AI agents shipped into production."
     />
     <link rel="canonical" href="https://antoinedumont.fr/" />
-    <meta name="theme-color" content="#0b0d0f" />
+    <meta name="theme-color" content="#f3ede2" />
     <meta name="author" content="Antoine Dumont" />
 
     <!-- Open Graph -->
@@ -41,8 +41,12 @@
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b0d0f'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='Arial, sans-serif' font-size='26' font-weight='700' fill='%23c8ff00'%3EAD%3C/text%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f2f9c'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='Arial, sans-serif' font-size='26' font-weight='700' fill='%23ffffff'%3EAD%3C/text%3E%3C/svg%3E"
     />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Caveat:wght@600;700&family=Geist+Mono:wght@400;500&display=swap" />
 
     <script type="application/ld+json">
       {
@@ -84,7 +88,215 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <header class="top" id="top">
+      <div class="wrap">
+        <a class="mark" href="#top">Antoine <i>Dumont</i></a>
+        <nav aria-label="Sections">
+          <a href="#engine">Pipeline</a>
+          <a href="#ai">AI</a>
+          <a href="#skills">Skills</a>
+          <a href="#work">Work</a>
+          <a href="#experience">Track record</a>
+        </nav>
+        <a class="pill" href="#contact">Contact</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <div>
+            <p class="kicker">Paris · Head of Marketing &amp; Applied AI</p>
+            <h1>
+              <span class="line"><span>Marketing that <em>ships.</em></span></span>
+              <span class="line"><span>AI that <em>works<button type="button" class="dotqr" id="dotqr" aria-label="Reveal a hidden QR code">.</button></em></span></span>
+            </h1>
+            <p class="lede">Fifteen years building <strong>B2B SaaS pipeline</strong>. The last few building <strong>applied AI systems that run in production</strong>: agents, automations, and the GTM plumbing underneath. I lead the team, and I ship the tooling myself.</p>
+            <div class="actions">
+              <a class="pill" href="#contact">Write to me
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+              <a class="pill ghost" href="https://fr.linkedin.com/in/antoine-dumont" target="_blank" rel="noreferrer">LinkedIn · 14k+ followers</a>
+            </div>
+          </div>
+          <figure class="portrait" id="portrait">
+            <div class="cut-wrap"><div class="cut" id="cut"><img src="/antoine-cutout.webp" alt="Portrait of Antoine Dumont" width="900" height="1012"></div><button type="button" class="pin" id="pin" aria-label="Lapel pin: reveal a QR code"><span class="qrsvg"></span><span class="pin-label">AI &amp; Tech Trends ↗</span></button></div>
+            <figcaption><span class="live" aria-hidden="true"></span><b>Head of Marketing, Go1</b><span>Marketing + SDR · SEMEA</span></figcaption>
+          </figure>
+          </div>
+        </div>
+      </section>
+
+      <div class="brands" aria-label="Companies and brands worked with">
+        <p class="brands-label">Worked with</p>
+        <div class="track" aria-hidden="true">
+          <span>Go1</span><span>Coorpacademy</span><span>Laureate</span><span>NetApp</span><span>IKEA France</span><span>AntBot</span>
+          <span>Go1</span><span>Coorpacademy</span><span>Laureate</span><span>NetApp</span><span>IKEA France</span><span>AntBot</span>
+        </div>
+      </div>
+
+      <section class="engine" id="engine">
+        <div class="wrap">
+          <div class="engine-head">
+            <div>
+              <p class="kicker">The allbound engine</p>
+              <h2>Every signal, <em>turned into</em> a sales conversation.</h2>
+            </div>
+            <p>Inbound, outbound, events and content feed one loop. AI agents research, score and follow up. Sales gets the conversations that are ready. This is the system I run, drawn live: hover it to slow it down.</p>
+          </div>
+          <div class="stage" id="stage">
+            <button type="button" class="lure" id="lure" aria-label="Reveal a hidden surprise: click the pipeline"><span class="lure-text">psst…<span class="long">there's a secret.</span><span class="cm">click me!</span></span><svg viewBox="0 0 92 70" aria-hidden="true"><path class="shaft" pathLength="1" d="M8 4 C 14 34, 40 58, 84 62"/><path class="head" pathLength="1" d="M70 52 L 85 62 L 69 70"/></svg></button>
+            <canvas id="engine-cv" aria-label="Animated diagram: marketing signals flow through AI agents into qualified pipeline for sales"></canvas>
+            <div class="stage-foot"><span class="flow-only">signals processed <b id="cnt-sig">0</b></span><span class="flow-only">qualified by agents <b id="cnt-q">0</b></span><span class="flow-only">handed to sales <b id="cnt-sql">0</b></span><a class="qr-only" href="https://www.linkedin.com/newsletters/ai-tech-trends-2024-7008752675219513344/" target="_blank" rel="noreferrer">Subscribe to AI &amp; Tech Trends on LinkedIn ↗</a><button type="button" class="qr-only" id="unqr">← Back to the engine</button></div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><strong>10<i>×</i></strong><span>ARR growth, from 1M to 10M in five years at Coorpacademy</span></div>
+            <div class="metric"><strong><i>$</i>1M</strong><span>pipeline generated every month at Go1</span></div>
+            <div class="metric"><strong>15<i>+</i></strong><span>years in B2B SaaS growth</span></div>
+            <div class="metric"><strong>14k<i>+</i></strong><span>followers on AI, tech and GTM</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="wrap">
+          <div class="head">
+            <p class="kicker">Current focus</p>
+            <h2>Four things I am <em>actually</em> doing right now.</h2>
+          </div>
+          <div class="focus">
+            <div class="focus-row"><span class="tag">AI</span><h3>Applied AI</h3><p>Agents that do real work: research, outreach, reporting, content ops. Shipped and measured, not demoed.</p></div>
+            <div class="focus-row"><span class="tag">REV</span><h3>Revenue marketing</h3><p>The pipeline engine end to end: demand, ABM, lifecycle. And ownership of the number it produces.</p></div>
+            <div class="focus-row"><span class="tag">OPS</span><h3>GTM systems</h3><p>CRM, data and automation wired into one loop, so marketing and sales run on the same signal.</p></div>
+            <div class="focus-row"><span class="tag">TEAM</span><h3>Teams</h3><p>Small marketing teams that ship weekly and work straight with sales, product and founders.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block antbot" id="ai">
+        <div class="wrap split">
+          <div class="head" style="margin:0">
+            <p class="kicker">AntBot.dev</p>
+            <h2>AntBot is the <em>proof,</em> not the pitch.</h2>
+            <p>Every morning it delivers a personalized 5-minute AI briefing in WhatsApp. Source monitoring, agent workflows, fact verification and text-to-speech, assembled into something 100+ testers actually use.</p>
+            <a class="textlink" href="https://antbot.dev/podcast/" target="_blank" rel="noreferrer">See it running
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          </div>
+          <div>
+          <div class="device-stage">
+            <div class="kb-hint" aria-hidden="true"><span>real keyboard. try it!</span><svg viewBox="0 0 62 46"><path d="M56 4 C 50 30, 30 40, 6 36"/><path d="M18 27 L 5 36 L 19 44"/></svg></div>
+            <div class="phone" aria-label="AntBot Podcast WhatsApp preview">
+             <div class="phone-inner">
+              <div class="screen" id="screen" tabindex="0">
+                <div class="island" id="island" aria-hidden="true"><span class="i-av">AB</span><span class="i-eq"><i></i><i></i><i></i><i></i></span></div>
+                <div class="status" aria-hidden="true"><span id="clock">7:30</span>
+                  <svg viewBox="0 0 70 12" fill="#111b21"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><path d="M24 4.2a8.5 8.5 0 0112 0l-1.3 1.4a6.6 6.6 0 00-9.4 0zm2.6 2.7a4.8 4.8 0 016.8 0L32 8.300a2.900 2.900 0 00-4 0zM30 9.300l1.600 1.700-1.600 1-1.600-1z"/><rect x="43" y="1" width="22" height="10" rx="3.2" fill="none" stroke="#111b21" stroke-opacity=".45" stroke-width="1"/><rect x="44.800" y="2.800" width="15" height="6.400" rx="1.800"/><rect x="66.300" y="4" width="1.800" height="4" rx=".9" fill-opacity=".5"/></svg></div>
+                <div class="wa-head">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#111b21" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                  <div class="wa-av">AB</div><div class="grow"><b>AntBot Podcast</b><small id="wa-state">en ligne</small></div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#111b21" stroke-width="1.700" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6.500" width="12" height="11" rx="3"/><path d="M15 10.500l5.500-3v9l-5.500-3z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#111b21" stroke-width="1.700" stroke-linejoin="round" aria-hidden="true"><path d="M6.500 4h3l1.500 4-2 1.500a11 11 0 005.500 5.500l1.500-2 4 1.500v3a2 2 0 01-2 2A16 16 0 014.500 6a2 2 0 012-2z"/></svg>
+                </div>
+                <div class="wa-body" id="wa">
+                  <span class="day">Aujourd'hui</span>
+                  <div class="bub"><strong>Bonjour !</strong> Ton briefing IA &amp; Tech est prêt.<span class="tm">07:30</span></div>
+                  <div class="bub">
+                    <span class="ep">Gemini 3 Ultra, Mistral $1B, et l'agent Salesforce</span>
+                    <div class="voice">
+                      <button class="play" id="play" type="button" aria-label="Écouter l'épisode">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                      </button>
+                      <div class="wave" id="wave" role="slider" aria-label="Position de lecture" aria-valuemin="0" aria-valuemax="123" aria-valuenow="0" tabindex="0"></div>
+                      <span class="v-av" aria-hidden="true">AB</span>
+                    </div>
+                    <div class="vmeta"><span id="vtime">0:00</span><span>07:30</span></div>
+                  </div>
+                </div>
+                <div class="wa-input" id="wa-input">
+                  <svg class="idle2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  <div class="field" id="field" aria-live="polite"><span class="ph" id="ph">Écris à AntBot…</span><span class="txt" id="txt"></span><span class="caret" aria-hidden="true"></span></div>
+                  <svg class="idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.500A2.500 2.500 0 016.500 6H8l1.500-2h5L16 6h1.500A2.500 2.500 0 0120 8.500v8a2.500 2.500 0 01-2.500 2.500h-11A2.500 2.500 0 014 16.500z"/><circle cx="12" cy="12.500" r="3.300"/></svg>
+                  <svg class="idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.500 11.500a6.500 6.500 0 0013 0M12 18v3"/></svg>
+                  <button class="send" id="send" type="button" aria-label="Envoyer"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 20.500l19-8.500L3 3.500v6.600l12 1.900-12 1.900z"/></svg></button>
+                </div>
+                <div class="kb" id="kb" role="group" aria-label="Clavier"></div>
+              </div>
+             </div>
+            </div>
+          </div>
+          <p class="hint">Real episode. Real keyboard. Go on, type something.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" id="skills">
+        <div class="wrap">
+          <div class="head">
+            <p class="kicker">Core skills</p>
+            <h2>Strategic enough for the board. <em>Technical enough</em> to build it.</h2>
+          </div>
+          <div class="skills">
+            <div class="skill"><h3>AI systems</h3><div class="chips"><span>Agentic workflows</span><span>Claude &amp; GPT APIs</span><span>MCP</span><span>RAG</span><span>Evals</span><span>Voice &amp; TTS</span><span>Vision</span></div></div>
+            <div class="skill"><h3>Growth &amp; demand</h3><div class="chips"><span>ABM</span><span>SEO &amp; GEO</span><span>Lifecycle</span><span>Paid acquisition</span><span>Content</span><span>Conversion</span></div></div>
+            <div class="skill"><h3>RevOps &amp; data</h3><div class="chips"><span>Salesforce</span><span>Attribution</span><span>Lead scoring</span><span>Dashboards</span><span>GA4</span></div></div>
+            <div class="skill"><h3>Build &amp; ship</h3><div class="chips"><span>TypeScript / React</span><span>Python</span><span>APIs &amp; automation</span><span>Claude Code</span><span>Vercel</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" id="work" style="padding-top:0">
+        <div class="wrap">
+          <div class="head">
+            <p class="kicker">Selected work</p>
+            <h2>Built, shipped, and <em>still running.</em></h2>
+          </div>
+          <div class="work">
+            <a class="card" href="https://antbot.dev/podcast/" target="_blank" rel="noreferrer"><span class="lbl">AI Lab</span><h3>AntBot Podcast</h3><p>A personalized 5-minute AI briefing delivered in WhatsApp every morning. Source monitoring, agent workflows, verification, text-to-speech. Now in the hands of 100+ testers.</p><span class="go">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a>
+            <a class="card" href="https://www.go1.com/" target="_blank" rel="noreferrer"><span class="lbl">Learning SaaS</span><h3>Coorpacademy to Go1</h3><p>B2B learning marketing from 1M to 10M ARR and through the acquisition: demand gen, CRM automation, ABM, sales alignment, post-acquisition positioning.</p><span class="go">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a>
+            <a class="card" href="https://www.antoinedumont.fr/" target="_blank" rel="noreferrer"><span class="lbl">Acquisition</span><h3>Education programs at scale</h3><p>Large-scale acquisition and conversion for higher education: landing pages, CRM integration, analytics, marketing automation.</p><span class="go">Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" id="experience" style="padding-top:0">
+        <div class="wrap">
+          <div class="head">
+            <p class="kicker">Track record</p>
+            <h2>From digital acquisition to SaaS growth to <em>applied AI.</em></h2>
+          </div>
+          <div class="tl">
+            <article class="tl-item" style="--i:0"><div class="tl-years">2022<br>today<br><span class="now">Current role</span></div><div><h3>Head of Marketing</h3><p class="tl-co">Go1</p><p>Marketing run with a business-owner mindset: create the right conversations, drive the SDR motion, build pipeline for the Go1 learning ecosystem.</p><ul><li>Own marketing and SDR priorities, turning market interest into $1M of pipeline per month for sales.</li><li>Line up campaigns, content, sales plays, events and outbound behind one revenue goal.</li><li>Put AI and automation into the GTM workflow itself: targeting, follow-up, execution speed.</li></ul></div></article>
+            <article class="tl-item" style="--i:1"><div class="tl-years">2017<br>2022</div><div><h3>Chief Marketing Officer</h3><p class="tl-co">Coorpacademy</p><p>Led marketing for a fast-growing B2B SaaS corporate learning company, through to the Go1 acquisition.</p><ul><li>Built the marketing function from the ground up: demand gen, ABM, content, CRM, international campaigns.</li><li>Ran the Salesforce revenue stack and the automation layer behind it, in lockstep with sales.</li><li>Grew ARR from 1M to 10M in five years, on the back of the marketing engine we built.</li></ul></div></article>
+            <article class="tl-item" style="--i:2"><div class="tl-years">2012<br>2017</div><div><h3>Digital Marketing Manager / Acquisition Lead</h3><p class="tl-co">Laureate</p><p>Web projects and digital acquisition for higher education programs: MBA, masters, business schools.</p><ul><li>Ran multichannel acquisition, landing pages, analytics, lead scoring and nurturing.</li><li>Integrated web activity with Microsoft Dynamics and deployed the marketing automation stack.</li><li>Managed agencies and delivery across education brands and their online conversion paths.</li></ul></div></article>
+            <article class="tl-item" style="--i:3"><div class="tl-years">2001<br>2012</div><div><h3>Digital projects, traffic and startup builder</h3><p class="tl-co">VENISE · Kohdao · TMTbourse</p><p>Agency delivery, London-based traffic acquisition, and an entrepreneurial finance media startup.</p><ul><li>Digital campaigns and web projects for B2B and B2C brands including NetApp and IKEA France.</li><li>SEO, SEM, affiliate, email and audience monetization across large property and media networks.</li><li>Co-founded TMTbourse: market content, technical analysis, and early algorithmic thinking.</li></ul></div></article>
+          </div>
+          <div class="edu" id="education">
+            <p class="kicker" style="width:100%">Engineer first. Marketer second.</p>
+            <div><b>ESIEA</b><span>Engineering degree, Bac+5 · 1999–2004</span></div>
+            <div><b>Montpellier Business School</b><span>MBA, Marketing · 2004–2005</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact" id="contact">
+        <div class="wrap">
+          <p class="kicker">Contact</p>
+          <h2>Write to me if <span class="rot" id="rot"><span>you need pipeline, not more content.</span></span></h2>
+          <div class="contact-row">
+            <button class="pill" type="button" id="copy">Copy my email</button>
+            <span class="email" id="email">antoine.dumont@outlook.com</span>
+            <span class="copied" id="copied" hidden>Copied</span>
+          </div>
+          <div class="contact-row" style="margin-top:14px">
+            <a class="pill ghost" href="https://fr.linkedin.com/in/antoine-dumont" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a class="pill ghost" href="https://www.linkedin.com/newsletters/ai-tech-trends-2024-7008752675219513344/" target="_blank" rel="noreferrer">AI &amp; Tech Trends newsletter</a>
+            <a class="pill ghost" href="https://antbot.dev/" target="_blank" rel="noreferrer">antbot.dev</a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="wrap"><span>© 2026 Antoine Dumont · Paris</span><a href="#top">Back to top ↑</a></div>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
