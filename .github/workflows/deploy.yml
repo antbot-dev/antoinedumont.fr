@@ -1,6 +1,6 @@
 name: Deploy to OVH
 
-# Every push to main builds the site and uploads dist/ to the OVH hosting over FTPS.
+# Every push to main builds the site and uploads dist/ to the OVH hosting over FTP (OVH shared hosting does not offer FTPS).
 # Secrets to set in Settings > Secrets and variables > Actions:
 #   OVH_FTP_SERVER    e.g. ftp.cluster0XX.hosting.ovh.net
 #   OVH_FTP_USERNAME  the FTP login shown in the OVH Manager
@@ -36,6 +36,6 @@ jobs:
           server: ${{ secrets.OVH_FTP_SERVER }}
           username: ${{ secrets.OVH_FTP_USERNAME }}
           password: ${{ secrets.OVH_FTP_PASSWORD }}
-          protocol: ftps
+          protocol: ftp  # OVH shared hosting refuses FTPS (AUTH TLS)
           local-dir: ./dist/
           server-dir: ${{ vars.OVH_FTP_DIR || 'www/' }}
