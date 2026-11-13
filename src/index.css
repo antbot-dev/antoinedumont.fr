@@ -444,7 +444,7 @@ footer a:hover { color: var(--band-ink); }
 /* Hidden QR #2: lapel pin, #3: the full stop of "works." */
 .cut-wrap { position: relative; }
 .pin {
-  position: absolute; z-index: 4; left: 67.8%; top: 72.5%; width: 26px; height: 26px; padding: 3px; border: 0; cursor: pointer;
+  position: absolute; z-index: 4; left: 61.8%; top: 81.6%; width: 26px; height: 26px; padding: 3px; border: 0; cursor: pointer;
   transform: translate(-50%, -50%) rotate(-22deg); border-radius: 50%;
   background: #fff; box-shadow: 0 0 0 2.5px #c9ccd3, 0 0 0 4px #1b1f2a, 0 3px 6px rgba(0,0,0,.45);
   transition: width .45s cubic-bezier(.2,.9,.2,1.15), height .45s cubic-bezier(.2,.9,.2,1.15), border-radius .45s, transform .45s, padding .45s, box-shadow .45s;
