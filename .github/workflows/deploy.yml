@@ -1,11 +1,12 @@
 name: Deploy to OVH
 
-# Every push to main builds the site and uploads dist/ to the OVH hosting over FTP (OVH shared hosting does not offer FTPS).
+# Every push to main builds the site and uploads dist/ to the OVH hosting over SFTP (port 22),
+# so the password never travels in clear text.
 # Secrets to set in Settings > Secrets and variables > Actions:
-#   OVH_FTP_SERVER    e.g. ftp.cluster0XX.hosting.ovh.net
-#   OVH_FTP_USERNAME  the FTP login shown in the OVH Manager
+#   OVH_FTP_SERVER    e.g. ftp.cluster0XX.hosting.ovh.net (the "FTP and SFTP server" in the OVH Manager)
+#   OVH_FTP_USERNAME  the login shown in the OVH Manager (SFTP must be enabled on it)
 #   OVH_FTP_PASSWORD  its password
-# Optional repository variable OVH_FTP_DIR (default "www/"): the web root on the hosting.
+# Optional repository variable OVH_FTP_DIR (default "www"): the web root, relative to the home directory.
 
 on:
   push:
@@ -30,12 +31,19 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Upload dist/ to OVH
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.OVH_FTP_SERVER }}
-          username: ${{ secrets.OVH_FTP_USERNAME }}
-          password: ${{ secrets.OVH_FTP_PASSWORD }}
-          protocol: ftp  # OVH shared hosting refuses FTPS (AUTH TLS)
-          local-dir: ./dist/
-          server-dir: ${{ vars.OVH_FTP_DIR || 'www/' }}
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Upload dist/ to OVH over SFTP
+        env:
+          SFTP_HOST: ${{ secrets.OVH_FTP_SERVER }}
+          SFTP_USER: ${{ secrets.OVH_FTP_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.OVH_FTP_PASSWORD }}
+          REMOTE_DIR: ${{ vars.OVH_FTP_DIR || 'www' }}
+        run: |
+          lftp --env-password -u "$SFTP_USER" "sftp://$SFTP_HOST:22" -e "
+            set sftp:auto-confirm yes;
+            set net:max-retries 2;
+            set net:timeout 20;
+            mirror --reverse --verbose --parallel=4 dist/ $REMOTE_DIR/;
+            bye"
