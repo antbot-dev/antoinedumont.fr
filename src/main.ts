@@ -7,6 +7,22 @@ import './index.css';
   const top = document.querySelector('.top');
   addEventListener('scroll', () => top.classList.toggle('scrolled', scrollY > 10), { passive: true });
 
+  // Hero: the portrait "ducks" into the disc as the page scrolls down
+  const wrapEl = document.querySelector('.cut-wrap');
+  if (wrapEl && !reduce) {
+    let ticking = false;
+    const duck = () => {
+      ticking = false;
+      const h = wrapEl.offsetHeight, top = wrapEl.getBoundingClientRect().top + scrollY;
+      const prog = Math.max(0, Math.min(1, scrollY / (top + h * .9)));
+      wrapEl.style.setProperty('--duck', (prog * prog * h * .62).toFixed(1) + 'px');
+      wrapEl.style.setProperty('--pin-o', Math.max(0, 1 - prog * 2.4).toFixed(3));
+      document.getElementById('pin').style.pointerEvents = prog > .35 ? 'none' : '';
+    };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(duck); } }, { passive: true });
+    addEventListener('resize', duck); duck();
+  }
+
   // Card spotlight
   document.querySelectorAll('.card').forEach(c => c.addEventListener('pointermove', e => {
     const r = c.getBoundingClientRect();
