@@ -353,7 +353,8 @@ import './index.css';
     ctx.save(); ctx.translate(A.x, A.y); ctx.rotate(tick / 120);
     ctx.setLineDash([3, 6]); ctx.beginPath(); ctx.arc(0, 0, ar + 14, 0, Math.PI * 2); ctx.strokeStyle = colors.soft; ctx.globalAlpha = .6; ctx.stroke(); ctx.restore(); ctx.globalAlpha = 1; ctx.setLineDash([]);
     ctx.textAlign = 'center'; ctx.fillStyle = colors.ink;
-    ctx.font = `700 ${vertical ? 17 : 21}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('AI agents', A.x, A.y + 2);
+    ctx.font = `500 ${vertical ? 10 : 12}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.flameBand; ctx.fillText('GTM', A.x, A.y - (vertical ? 12 : 15));
+    ctx.fillStyle = colors.ink; ctx.font = `700 ${vertical ? 17 : 21}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('AI agents', A.x, A.y + (vertical ? 10 : 12));
     ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.soft;
     ctx.fillText('RESEARCH · SCORE · FOLLOW UP', A.x, A.y + ar + 32);
     // pipeline: starts tiny, swells with each deal, pours into the current quarter, then moves right
