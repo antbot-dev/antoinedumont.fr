@@ -207,10 +207,10 @@ import './index.css';
   let W, H, dpr, vertical, colors = {}, colorsReady = false;
   const nodes = {};
   // fallbacks: on a slow phone the script can run before the stylesheet applies, and an empty colour would paint everything black
-  const FALLBACK = { '--band-ink': '#f3ede2', '--band-soft': '#a89c8b', '--band-line': '#3a322a', '--flame': '#4f9dff', '--on-flame': '#04122b', '--clay': '#3d8cf2', '--band': '#1b1611' };
+  const FALLBACK = { '--band-ink': '#f3ede2', '--band-soft': '#a89c8b', '--band-line': '#3a322a', '--flame': '#4f9dff', '--flame-band': '#4f9dff', '--on-flame': '#04122b', '--clay': '#3d8cf2', '--band': '#1b1611' };
   const okColor = v => { if (!v) return false; ctx.fillStyle = '#010203'; ctx.fillStyle = v; return ctx.fillStyle !== '#010203'; };
   const css = n => { const v = getComputedStyle(cv).getPropertyValue(n).trim(); return okColor(v) ? v : FALLBACK[n]; };
-  function readColors() { colorsReady = !!getComputedStyle(cv).getPropertyValue('--band').trim(); colors = { ink: css('--band-ink'), soft: css('--band-soft'), line: css('--band-line'), flame: css('--flame'), onFlame: css('--on-flame'), clay: css('--clay'), band: css('--band') }; }
+  function readColors() { colorsReady = !!getComputedStyle(cv).getPropertyValue('--band').trim(); colors = { ink: css('--band-ink'), soft: css('--band-soft'), line: css('--band-line'), flame: css('--flame'), flameBand: css('--flame-band'), onFlame: css('--on-flame'), clay: css('--clay'), band: css('--band') }; }
   function layout() {
     dpr = Math.min(devicePixelRatio || 1, 2);
     const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
@@ -218,9 +218,10 @@ import './index.css';
     vertical = W < 640;
     nodes.src = sources.map((s, i) => vertical
       ? { x: W * (0.1 + i * 0.16), y: 54, label: s }
-      : { x: Math.max(110, W * 0.14), y: H * (0.13 + i * 0.148), label: s });
-    nodes.agent = vertical ? { x: W / 2, y: H * 0.44 } : { x: W * 0.47, y: H / 2 };
-    nodes.sales = vertical ? { x: W / 2, y: H - 70 } : { x: W - Math.max(180, W * 0.17), y: H / 2 };
+      : { x: Math.max(110, W * 0.14), y: H * (0.08 + i * 0.135), label: s });
+    nodes.agent = vertical ? { x: W / 2, y: H * 0.36 } : { x: W * 0.47, y: H * 0.42 };
+    nodes.sales = vertical ? { x: W / 2, y: H * 0.635 } : { x: W - Math.max(180, W * 0.17), y: H * 0.42 };
+    nodes.rev = { x: nodes.sales.x, y: H - (vertical ? 66 : 62) };
     const lure = document.getElementById('lure'), sr0 = vertical ? 34 : 44;
     lure.classList.add('right'); lure.classList.toggle('narrow', vertical);
     lure.style.left = (nodes.sales.x + sr0 * .72 - 4) + 'px'; lure.style.top = (nodes.sales.y - sr0 * .72 + 8) + 'px';
@@ -246,6 +247,10 @@ import './index.css';
     ctx.strokeStyle = colors.line; ctx.globalAlpha = alpha; ctx.lineWidth = 1.2; ctx.stroke(); ctx.globalAlpha = 1;
   }
   let agentPulse = 0, salesPulse = 0;
+  // Pipeline fills up with deals, then pours into Revenue as $ and starts again
+  const FULL = 22, DEAL = 45000, held = [], coins = []; let pouring = false, pourTick = 0, revGlow = 0, revenue = 0, curR = 0;
+  const addHeld = () => held.push({ a: Math.random() * Math.PI * 2, d: .25 + .75 * Math.sqrt(Math.random()), ph: Math.random() * 6.28 });
+  const money = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(v / 1e3) + 'K';
   // ===== Hidden QR: AI & Tech Trends newsletter =====
   const QR = '1111111010011110101101000010001111111,1000001000010011000011111011101000001,1011101001101110111111010011001011101,1011101011101101101100010110101011101,1011101010101001000000011111101011101,1000001010010000001110000110001000001,1111111010101010101010101010101111111,0000000011101001111011111100000000000,1000101111001101001100111111111111001,1011010010010110100111000110000111110,0101101010111010100010011010100110100,0001100101111000010001100011001000110,1001101001110101010101101000011001111,1110110110001111110000010111110011000,0011011000111101101001011101010111110,1100010000101001000010001101110110110,0011001010011100100110010111110001100,1100110000011000001100011111111011010,0100111101010111000101011011000001100,1000110110111001111111000000101100110,1111001101011000111001111000011101100,1010100100110011101001110111110110000,1101001011101101010011011001100111100,1001010000010001011010000001001110101,0001101001001101001101100111001101101,1001110010101100110110100000110010000,0011101010000010101010010001100011000,0000100000000110011001010011101110101,1100011001011101010111101000111110101,0000000011101001011000110010100010000,1111111010001001001001110000101010000,1000001001010111100011101000100011100,1011101011100011100010011110111111111,1011101000111110001100001010101101010,1011101001000001010100110110011000110,1000001001001101111111000001100010110,1111111010111000010011111010010100111'.split(',');
   const QN = QR.length; const mods = [];
@@ -314,7 +319,7 @@ import './index.css';
         if (q.t >= 1) { agentPulse = 1; if (q.qual) { q.stage = 1; q.t = 0; cQ++; } else { parts.splice(i, 1); continue; } }
       } else {
         pos = bez(nodes.agent, nodes.sales, Math.min(q.t, 1), q.jit * .4);
-        if (q.t >= 1) { salesPulse = 1; cS++; parts.splice(i, 1); continue; }
+        if (q.t >= 1) { salesPulse = 1; cS++; addHeld(); if (held.length >= FULL) pouring = true; parts.splice(i, 1); continue; }
       }
       const r = q.stage ? 4 : 2.6;
       ctx.beginPath(); ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
@@ -340,19 +345,53 @@ import './index.css';
     ctx.font = `700 ${vertical ? 17 : 21}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('AI agents', A.x, A.y + 2);
     ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.soft;
     ctx.fillText('RESEARCH · SCORE · FOLLOW UP', A.x, A.y + ar + 32);
-    // sales node
-    const S = nodes.sales, sr = vertical ? 34 : 44;
-    ctx.beginPath(); ctx.arc(S.x, S.y, sr + salesPulse * 12, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.globalAlpha = .15 + salesPulse * .3; ctx.fill(); ctx.globalAlpha = 1;
+    // sales node: grows as it fills with deals
+    const S = nodes.sales, sr = vertical ? 34 : 44, R = nodes.rev, rr = vertical ? 30 : 36;
+    const target = sr * (1 + .7 * Math.min(held.length, FULL) / FULL);
+    curR = curR ? curR + (target - curR) * .12 : target;
+    // pour: deals leave the bottom of the pipeline and fall into revenue as $
+    if (pouring && !reduce) {
+      if (++pourTick % 5 === 0 && held.length) { held.pop(); coins.push({ x: S.x + (Math.random() - .5) * curR * .7, y: S.y + curR * .6, vy: .6 + Math.random() * .8, t: 0 }); }
+      if (!held.length) { pouring = false; pourTick = 0; }
+    }
+    // link pipeline -> revenue
+    ctx.setLineDash([2, 6]); ctx.beginPath(); ctx.moveTo(S.x, S.y + curR + 6); ctx.lineTo(R.x, R.y - rr - 6);
+    ctx.strokeStyle = colors.line; ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(S.x, S.y, curR + salesPulse * 12, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.globalAlpha = .15 + salesPulse * .3; ctx.fill(); ctx.globalAlpha = 1;
     for (let k = 0; k < 2; k++) {
       const ph = ((tick + k * 50) % 100) / 100;
-      ctx.beginPath(); ctx.arc(S.x, S.y, sr + ph * 46, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(S.x, S.y, curR + ph * 46, 0, Math.PI * 2);
       ctx.strokeStyle = colors.flame; ctx.lineWidth = 2; ctx.globalAlpha = (1 - ph) * .7; ctx.stroke(); ctx.globalAlpha = 1;
     }
-    ctx.beginPath(); ctx.arc(S.x, S.y, sr, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.fill();
-    ctx.fillStyle = colors.onFlame; ctx.font = `700 ${vertical ? 14 : 17}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('Pipeline', S.x, S.y + 6);
+    ctx.beginPath(); ctx.arc(S.x, S.y, curR, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.fill();
+    // the deals held inside, swirling slowly
+    ctx.fillStyle = colors.onFlame;
+    held.forEach(h => {
+      const a = h.a + tick * .012, d = h.d * (curR - 7), j = Math.sin(tick * .08 + h.ph) * 1.5;
+      ctx.globalAlpha = .38; ctx.beginPath(); ctx.arc(S.x + Math.cos(a) * d + j, S.y + Math.sin(a) * d, 3.2, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    if (held.length >= FULL * .8 && !pouring) { ctx.beginPath(); ctx.arc(S.x, S.y, curR + 4 + Math.sin(tick * .3) * 2, 0, Math.PI * 2); ctx.strokeStyle = colors.flameBand; ctx.lineWidth = 2; ctx.stroke(); }
+    ctx.textAlign = 'center'; ctx.fillStyle = colors.onFlame; ctx.font = `700 ${vertical ? 14 : 17}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('Pipeline', S.x, S.y + 6);
     ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.soft;
-    if (vertical) ctx.fillText('SALES CONVERSATIONS', S.x, S.y + sr + 22);
-    else ctx.fillText('SALES', S.x, S.y + sr + 24);
+    if (vertical) { ctx.textAlign = 'right'; ctx.fillText('SALES', S.x - curR - 14, S.y - 2); ctx.fillText('CONVERSATIONS', S.x - curR - 14, S.y + 11); }
+    else ctx.fillText('SALES', S.x, S.y - curR - 18);
+    // falling $
+    ctx.textAlign = 'center';
+    for (let i = coins.length - 1; i >= 0; i--) {
+      const c = coins[i]; c.vy += .22; c.y += c.vy; c.x += (R.x - c.x) * .05; c.t = Math.min(1, c.t + .06);
+      if (c.y >= R.y - rr * .3) { coins.splice(i, 1); revenue += DEAL; revGlow = 1; continue; }
+      ctx.font = `700 ${Math.round(9 + c.t * 9)}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillStyle = colors.flameBand; ctx.fillText('$', c.x, c.y + 5);
+    }
+    // revenue node
+    revGlow *= .975;
+    ctx.beginPath(); ctx.arc(R.x, R.y, rr + revGlow * 10, 0, Math.PI * 2); ctx.fillStyle = colors.flameBand; ctx.globalAlpha = .08 + revGlow * .25; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(R.x, R.y, rr, 0, Math.PI * 2); ctx.fillStyle = colors.band; ctx.fill(); ctx.strokeStyle = colors.flameBand; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = colors.ink; ctx.font = `700 ${vertical ? 12 : 14}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('Revenue', R.x, R.y + 5);
+    ctx.textAlign = 'left'; ctx.font = `500 ${vertical ? 10 : 11}px "Geist Mono", ui-monospace, monospace`;
+    ctx.fillStyle = colors.flameBand; ctx.fillText(money(revenue), R.x + rr + 14, R.y - 1);
+    ctx.fillStyle = colors.soft; ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillText('CLOSED-WON', R.x + rr + 14, R.y + 13);
+    ctx.textAlign = 'center';
 
     elSig.textContent = cSig.toLocaleString('en-US'); elQ.textContent = cQ.toLocaleString('en-US'); elS.textContent = cS.toLocaleString('en-US');
     if (!reduce) qrT = qrOn ? Math.min(1.6, qrT + 1 / 60) : Math.max(0, qrT - 1 / 40);
@@ -360,7 +399,7 @@ import './index.css';
     tick++;
     if (!reduce) requestAnimationFrame(frame);
   }
-  const onSales = e => { const r = cv.getBoundingClientRect(), S = nodes.sales; return Math.hypot(e.clientX - r.left - S.x, e.clientY - r.top - S.y) < (vertical ? 46 : 58); };
+  const onSales = e => { const r = cv.getBoundingClientRect(), S = nodes.sales; return Math.hypot(e.clientX - r.left - S.x, e.clientY - r.top - S.y) < Math.max(vertical ? 46 : 58, curR + 10); };
   cv.addEventListener('click', e => { if (qrOn) setQR(false); else if (onSales(e)) setQR(true); });
   cv.addEventListener('pointermove', e => { cv.style.cursor = qrOn || onSales(e) ? 'pointer' : 'default'; });
   document.getElementById('lure').addEventListener('click', () => setQR(true));
