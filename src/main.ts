@@ -221,19 +221,20 @@ import './index.css';
       : { x: Math.max(110, W * 0.14), y: H * (0.08 + i * 0.135), label: s });
     nodes.agent = vertical ? { x: W / 2, y: H * 0.3 } : { x: W * 0.47, y: H * 0.42 };
     // revenue bar chart (Q1..Q4); the pipeline travels above it, left to right
-    const x0 = vertical ? W * 0.2 : W * 0.6, x1 = vertical ? W * 0.84 : W - Math.max(190, W * 0.17);
+    const x0 = vertical ? W * 0.17 : W * 0.64, x1 = vertical ? W * 0.86 : W - 70;
     chart.base = H - (vertical ? 58 : 54); chart.h = vertical ? H * 0.17 : H * 0.28; chart.bw = Math.min(56, (x1 - x0) / 3 * .55);
     chart.xs = [0, 1, 2, 3].map(i => x0 + (x1 - x0) * i / 3);
     nodes.sales = { x: chart.xs[quarter], y: vertical ? H * 0.6 : H * 0.34 };
-    placeLure(28);
+    placeLure();
   }
   const chart = {}; let quarter = 0, lureKey = '';
   const lureEl = document.getElementById('lure');
-  function placeLure(r) {
-    const S = nodes.sales, right = S.x < W * 0.5, k = right + ':' + Math.round(S.x) + ':' + Math.round(r / 4);
+  // the hint sits at the top right of the AI agents node
+  function placeLure() {
+    const A = nodes.agent, r = vertical ? 46 : 58, k = Math.round(A.x) + ':' + Math.round(A.y) + ':' + vertical;
     if (k === lureKey) return; lureKey = k;
-    lureEl.classList.toggle('right', right); lureEl.classList.toggle('narrow', vertical);
-    lureEl.style.left = (right ? S.x + r * .72 - 4 : S.x - r * .72 + 4) + 'px'; lureEl.style.top = (S.y - r * .72 + 8) + 'px';
+    lureEl.classList.add('right'); lureEl.classList.toggle('narrow', vertical);
+    lureEl.style.left = (A.x + r * .72 - 4) + 'px'; lureEl.style.top = (A.y - r * .72 + 8) + 'px';
   }
   const parts = []; let tick = 0, slow = 1, cSig = 0, cQ = 0, cS = 0;
   const elSig = document.getElementById('cnt-sig'), elQ = document.getElementById('cnt-q'), elS = document.getElementById('cnt-sql');
@@ -366,7 +367,6 @@ import './index.css';
       if (!held.length) { pouring = false; pourTick = 0; if (quarter < 3) quarter++; else resetT = 1; }
     }
     if (resetT > 0 && !coins.length) { resetT -= 1 / 150; if (resetT <= 0) { resetT = 0; quarter = 0; qbars.fill(0); revenue = 0; } }
-    placeLure(curR);
     // bar chart
     const { base, h: ch, bw, xs } = chart, unit = ch / MAXF;
     ctx.strokeStyle = colors.line; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(xs[0] - bw, base + .5); ctx.lineTo(xs[3] + bw, base + .5); ctx.stroke();
@@ -413,7 +413,7 @@ import './index.css';
     tick++;
     if (!reduce) requestAnimationFrame(frame);
   }
-  const onSales = e => { const r = cv.getBoundingClientRect(), S = nodes.sales; return Math.hypot(e.clientX - r.left - S.x, e.clientY - r.top - S.y) < Math.max(vertical ? 40 : 46, curR + 12); };
+  const onSales = e => { const r = cv.getBoundingClientRect(), A = nodes.agent; return Math.hypot(e.clientX - r.left - A.x, e.clientY - r.top - A.y) < (vertical ? 56 : 70); };
   cv.addEventListener('click', e => { if (qrOn) setQR(false); else if (onSales(e)) setQR(true); });
   cv.addEventListener('pointermove', e => { cv.style.cursor = qrOn || onSales(e) ? 'pointer' : 'default'; });
   document.getElementById('lure').addEventListener('click', () => setQR(true));
