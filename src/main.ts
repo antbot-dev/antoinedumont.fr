@@ -219,12 +219,21 @@ import './index.css';
     nodes.src = sources.map((s, i) => vertical
       ? { x: W * (0.1 + i * 0.16), y: 54, label: s }
       : { x: Math.max(110, W * 0.14), y: H * (0.08 + i * 0.135), label: s });
-    nodes.agent = vertical ? { x: W / 2, y: H * 0.36 } : { x: W * 0.47, y: H * 0.42 };
-    nodes.sales = vertical ? { x: W / 2, y: H * 0.635 } : { x: W - Math.max(180, W * 0.17), y: H * 0.42 };
-    nodes.rev = { x: nodes.sales.x, y: H - (vertical ? 66 : 62) };
-    const lure = document.getElementById('lure'), sr0 = vertical ? 34 : 44;
-    lure.classList.add('right'); lure.classList.toggle('narrow', vertical);
-    lure.style.left = (nodes.sales.x + sr0 * .72 - 4) + 'px'; lure.style.top = (nodes.sales.y - sr0 * .72 + 8) + 'px';
+    nodes.agent = vertical ? { x: W / 2, y: H * 0.3 } : { x: W * 0.47, y: H * 0.42 };
+    // revenue bar chart (Q1..Q4); the pipeline travels above it, left to right
+    const x0 = vertical ? W * 0.2 : W * 0.6, x1 = vertical ? W * 0.84 : W - Math.max(190, W * 0.17);
+    chart.base = H - (vertical ? 58 : 54); chart.h = vertical ? H * 0.17 : H * 0.28; chart.bw = Math.min(56, (x1 - x0) / 3 * .55);
+    chart.xs = [0, 1, 2, 3].map(i => x0 + (x1 - x0) * i / 3);
+    nodes.sales = { x: chart.xs[quarter], y: vertical ? H * 0.6 : H * 0.34 };
+    placeLure(28);
+  }
+  const chart = {}; let quarter = 0, lureKey = '';
+  const lureEl = document.getElementById('lure');
+  function placeLure(r) {
+    const S = nodes.sales, right = S.x < W * 0.5, k = right + ':' + Math.round(S.x) + ':' + Math.round(r / 4);
+    if (k === lureKey) return; lureKey = k;
+    lureEl.classList.toggle('right', right); lureEl.classList.toggle('narrow', vertical);
+    lureEl.style.left = (right ? S.x + r * .72 - 4 : S.x - r * .72 + 4) + 'px'; lureEl.style.top = (S.y - r * .72 + 8) + 'px';
   }
   const parts = []; let tick = 0, slow = 1, cSig = 0, cQ = 0, cS = 0;
   const elSig = document.getElementById('cnt-sig'), elQ = document.getElementById('cnt-q'), elS = document.getElementById('cnt-sql');
@@ -248,7 +257,7 @@ import './index.css';
   }
   let agentPulse = 0, salesPulse = 0;
   // Pipeline fills up with deals, then pours into Revenue as $ and starts again
-  const FULL = 22, DEAL = 45000, held = [], coins = []; let pouring = false, pourTick = 0, revGlow = 0, revenue = 0, curR = 0;
+  const FULLS = [10, 14, 18, 22], MAXF = 22, DEAL = 45000, held = [], coins = [], qbars = [0, 0, 0, 0], shown = [0, 0, 0, 0]; let pouring = false, pourTick = 0, revenue = 0, curR = 0, resetT = 0;
   const addHeld = () => held.push({ a: Math.random() * Math.PI * 2, d: .25 + .75 * Math.sqrt(Math.random()), ph: Math.random() * 6.28 });
   const money = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + 'M' : '$' + Math.round(v / 1e3) + 'K';
   // ===== Hidden QR: AI & Tech Trends newsletter =====
@@ -319,7 +328,7 @@ import './index.css';
         if (q.t >= 1) { agentPulse = 1; if (q.qual) { q.stage = 1; q.t = 0; cQ++; } else { parts.splice(i, 1); continue; } }
       } else {
         pos = bez(nodes.agent, nodes.sales, Math.min(q.t, 1), q.jit * .4);
-        if (q.t >= 1) { salesPulse = 1; cS++; addHeld(); if (held.length >= FULL) pouring = true; parts.splice(i, 1); continue; }
+        if (q.t >= 1) { salesPulse = 1; cS++; if (!pouring && resetT === 0 && held.length < FULLS[quarter] && Math.abs(nodes.sales.x - chart.xs[quarter]) < 2) addHeld();  parts.splice(i, 1); continue; }
       }
       const r = q.stage ? 4 : 2.6;
       ctx.beginPath(); ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
@@ -345,53 +354,58 @@ import './index.css';
     ctx.font = `700 ${vertical ? 17 : 21}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('AI agents', A.x, A.y + 2);
     ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.soft;
     ctx.fillText('RESEARCH · SCORE · FOLLOW UP', A.x, A.y + ar + 32);
-    // sales node: grows as it fills with deals
-    const S = nodes.sales, sr = vertical ? 34 : 44, R = nodes.rev, rr = vertical ? 30 : 36;
-    const target = sr * (1 + .7 * Math.min(held.length, FULL) / FULL);
+    // pipeline: starts tiny, swells with each deal, pours into the current quarter, then moves right
+    const S = nodes.sales, r0 = vertical ? 9 : 11, rMax = vertical ? 42 : 54, full = FULLS[quarter];
+    const target = r0 + (rMax - r0) * Math.min(held.length, MAXF) / MAXF;
     curR = curR ? curR + (target - curR) * .12 : target;
-    // pour: deals leave the bottom of the pipeline and fall into revenue as $
+    const tx = resetT > 0 ? chart.xs[0] : chart.xs[quarter];
+    S.x += (tx - S.x) * .05; const arrived = Math.abs(tx - S.x) < 1.5;
+    if (!pouring && arrived && resetT === 0 && held.length >= full) pouring = true;
     if (pouring && !reduce) {
-      if (++pourTick % 5 === 0 && held.length) { held.pop(); coins.push({ x: S.x + (Math.random() - .5) * curR * .7, y: S.y + curR * .6, vy: .6 + Math.random() * .8, t: 0 }); }
-      if (!held.length) { pouring = false; pourTick = 0; }
+      if (++pourTick % 5 === 0 && held.length) { held.pop(); coins.push({ x: S.x + (Math.random() - .5) * curR * .6, y: S.y + curR * .6, vy: .5 + Math.random() * .6, t: 0, q: quarter }); }
+      if (!held.length) { pouring = false; pourTick = 0; if (quarter < 3) quarter++; else resetT = 1; }
     }
-    // link pipeline -> revenue
-    ctx.setLineDash([2, 6]); ctx.beginPath(); ctx.moveTo(S.x, S.y + curR + 6); ctx.lineTo(R.x, R.y - rr - 6);
-    ctx.strokeStyle = colors.line; ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
-    ctx.beginPath(); ctx.arc(S.x, S.y, curR + salesPulse * 12, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.globalAlpha = .15 + salesPulse * .3; ctx.fill(); ctx.globalAlpha = 1;
-    for (let k = 0; k < 2; k++) {
-      const ph = ((tick + k * 50) % 100) / 100;
-      ctx.beginPath(); ctx.arc(S.x, S.y, curR + ph * 46, 0, Math.PI * 2);
-      ctx.strokeStyle = colors.flame; ctx.lineWidth = 2; ctx.globalAlpha = (1 - ph) * .7; ctx.stroke(); ctx.globalAlpha = 1;
-    }
-    ctx.beginPath(); ctx.arc(S.x, S.y, curR, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.fill();
-    // the deals held inside, swirling slowly
-    ctx.fillStyle = colors.onFlame;
-    held.forEach(h => {
-      const a = h.a + tick * .012, d = h.d * (curR - 7), j = Math.sin(tick * .08 + h.ph) * 1.5;
-      ctx.globalAlpha = .38; ctx.beginPath(); ctx.arc(S.x + Math.cos(a) * d + j, S.y + Math.sin(a) * d, 3.2, 0, Math.PI * 2); ctx.fill();
+    if (resetT > 0 && !coins.length) { resetT -= 1 / 150; if (resetT <= 0) { resetT = 0; quarter = 0; qbars.fill(0); revenue = 0; } }
+    placeLure(curR);
+    // bar chart
+    const { base, h: ch, bw, xs } = chart, unit = ch / MAXF;
+    ctx.strokeStyle = colors.line; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(xs[0] - bw, base + .5); ctx.lineTo(xs[3] + bw, base + .5); ctx.stroke();
+    ctx.textAlign = 'center'; ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`;
+    const fadeBars = resetT > 0 && resetT < .5 ? resetT * 2 : 1;
+    xs.forEach((x, i) => {
+      shown[i] += (qbars[i] - shown[i]) * .2;
+      ctx.setLineDash([2, 4]); ctx.strokeStyle = colors.line; ctx.lineWidth = 1; ctx.strokeRect(x - bw / 2, base - FULLS[i] * unit, bw, FULLS[i] * unit); ctx.setLineDash([]);
+      const bh = shown[i] * unit;
+      if (bh > .5) { ctx.globalAlpha = fadeBars; ctx.fillStyle = colors.flameBand; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x - bw / 2, base - bh, bw, bh, [5, 5, 0, 0]); else ctx.rect(x - bw / 2, base - bh, bw, bh); ctx.fill(); ctx.globalAlpha = 1; }
+      ctx.fillStyle = i === quarter && resetT === 0 ? colors.ink : colors.soft; ctx.fillText('Q' + (i + 1), x, base + 17);
     });
-    ctx.globalAlpha = 1;
-    if (held.length >= FULL * .8 && !pouring) { ctx.beginPath(); ctx.arc(S.x, S.y, curR + 4 + Math.sin(tick * .3) * 2, 0, Math.PI * 2); ctx.strokeStyle = colors.flameBand; ctx.lineWidth = 2; ctx.stroke(); }
-    ctx.textAlign = 'center'; ctx.fillStyle = colors.onFlame; ctx.font = `700 ${vertical ? 14 : 17}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('Pipeline', S.x, S.y + 6);
-    ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.soft;
-    if (vertical) { ctx.textAlign = 'right'; ctx.fillText('SALES', S.x - curR - 14, S.y - 2); ctx.fillText('CONVERSATIONS', S.x - curR - 14, S.y + 11); }
-    else ctx.fillText('SALES', S.x, S.y - curR - 18);
+    ctx.fillStyle = colors.soft; ctx.fillText('REVENUE', (xs[0] + xs[3]) / 2 - (vertical ? 30 : 36), base + 36);
+    ctx.fillStyle = colors.flameBand; ctx.textAlign = 'left'; ctx.fillText(money(revenue), (xs[0] + xs[3]) / 2 + (vertical ? 2 : 4), base + 36);
     // falling $
     ctx.textAlign = 'center';
     for (let i = coins.length - 1; i >= 0; i--) {
-      const c = coins[i]; c.vy += .22; c.y += c.vy; c.x += (R.x - c.x) * .05; c.t = Math.min(1, c.t + .06);
-      if (c.y >= R.y - rr * .3) { coins.splice(i, 1); revenue += DEAL; revGlow = 1; continue; }
-      ctx.font = `700 ${Math.round(9 + c.t * 9)}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillStyle = colors.flameBand; ctx.fillText('$', c.x, c.y + 5);
+      const c = coins[i], top = base - qbars[c.q] * unit; c.vy += .2; c.y += c.vy; c.x += (xs[c.q] - c.x) * .08; c.t = Math.min(1, c.t + .06);
+      if (c.y >= top - 4) { coins.splice(i, 1); qbars[c.q]++; revenue += DEAL; continue; }
+      ctx.font = `700 ${Math.round(9 + c.t * 8)}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillStyle = colors.flameBand; ctx.fillText('$', c.x, c.y + 5);
     }
-    // revenue node
-    revGlow *= .975;
-    ctx.beginPath(); ctx.arc(R.x, R.y, rr + revGlow * 10, 0, Math.PI * 2); ctx.fillStyle = colors.flameBand; ctx.globalAlpha = .08 + revGlow * .25; ctx.fill(); ctx.globalAlpha = 1;
-    ctx.beginPath(); ctx.arc(R.x, R.y, rr, 0, Math.PI * 2); ctx.fillStyle = colors.band; ctx.fill(); ctx.strokeStyle = colors.flameBand; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.fillStyle = colors.ink; ctx.font = `700 ${vertical ? 12 : 14}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('Revenue', R.x, R.y + 5);
-    ctx.textAlign = 'left'; ctx.font = `500 ${vertical ? 10 : 11}px "Geist Mono", ui-monospace, monospace`;
-    ctx.fillStyle = colors.flameBand; ctx.fillText(money(revenue), R.x + rr + 14, R.y - 1);
-    ctx.fillStyle = colors.soft; ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillText('CLOSED-WON', R.x + rr + 14, R.y + 13);
+    // pipeline disc
+    ctx.beginPath(); ctx.arc(S.x, S.y, curR + salesPulse * 10, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.globalAlpha = .15 + salesPulse * .3; ctx.fill(); ctx.globalAlpha = 1;
+    for (let k = 0; k < 2; k++) {
+      const ph = ((tick + k * 50) % 100) / 100;
+      ctx.beginPath(); ctx.arc(S.x, S.y, curR + ph * 34, 0, Math.PI * 2);
+      ctx.strokeStyle = colors.flame; ctx.lineWidth = 2; ctx.globalAlpha = (1 - ph) * .6; ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    ctx.beginPath(); ctx.arc(S.x, S.y, curR, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.fill();
+    ctx.fillStyle = colors.onFlame;
+    held.forEach(hd => {
+      const a = hd.a + tick * .012, d = hd.d * Math.max(0, curR - 6), j = Math.sin(tick * .08 + hd.ph) * 1.2;
+      ctx.globalAlpha = .4; ctx.beginPath(); ctx.arc(S.x + Math.cos(a) * d + j, S.y + Math.sin(a) * d, Math.min(3.2, curR / 4), 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    if (held.length >= full * .85 && !pouring) { ctx.beginPath(); ctx.arc(S.x, S.y, curR + 4 + Math.sin(tick * .3) * 2, 0, Math.PI * 2); ctx.strokeStyle = colors.flameBand; ctx.lineWidth = 2; ctx.stroke(); }
     ctx.textAlign = 'center';
+    if (curR > (vertical ? 30 : 36)) { ctx.fillStyle = colors.onFlame; ctx.font = `700 ${vertical ? 13 : 16}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('Pipeline', S.x, S.y + 5); }
+    else { ctx.fillStyle = colors.ink; ctx.font = `700 ${vertical ? 13 : 15}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('Pipeline', S.x, S.y - curR - 12); }
 
     elSig.textContent = cSig.toLocaleString('en-US'); elQ.textContent = cQ.toLocaleString('en-US'); elS.textContent = cS.toLocaleString('en-US');
     if (!reduce) qrT = qrOn ? Math.min(1.6, qrT + 1 / 60) : Math.max(0, qrT - 1 / 40);
@@ -399,7 +413,7 @@ import './index.css';
     tick++;
     if (!reduce) requestAnimationFrame(frame);
   }
-  const onSales = e => { const r = cv.getBoundingClientRect(), S = nodes.sales; return Math.hypot(e.clientX - r.left - S.x, e.clientY - r.top - S.y) < Math.max(vertical ? 46 : 58, curR + 10); };
+  const onSales = e => { const r = cv.getBoundingClientRect(), S = nodes.sales; return Math.hypot(e.clientX - r.left - S.x, e.clientY - r.top - S.y) < Math.max(vertical ? 40 : 46, curR + 12); };
   cv.addEventListener('click', e => { if (qrOn) setQR(false); else if (onSales(e)) setQR(true); });
   cv.addEventListener('pointermove', e => { cv.style.cursor = qrOn || onSales(e) ? 'pointer' : 'default'; });
   document.getElementById('lure').addEventListener('click', () => setQR(true));
