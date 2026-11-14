@@ -196,6 +196,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .lure.right.narrow .lure-text { margin-left: 34px; }
 .lure.right svg { transform: scaleX(-1); }
 .lure.narrow .long { display: none; }
+/* compact version next to the AI agents node */
+.lure.agent svg { width: 54px; height: 40px; margin-top: -2px; }
+.lure.agent .lure-text { font-size: 28px; margin-left: 18px; }
+@media (max-width: 640px) { .lure.agent svg { width: 44px; height: 33px; } .lure.agent .lure-text { font-size: 22px; margin-left: 14px; } }
 .lure:not(.narrow) .long, .lure .cm { display: block; }
 @keyframes wiggle-r { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(2deg) translateY(-3px); } }
 .stage.qr .lure { opacity: 0; pointer-events: none; }

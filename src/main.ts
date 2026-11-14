@@ -233,8 +233,8 @@ import './index.css';
   function placeLure() {
     const A = nodes.agent, r = vertical ? 46 : 58, k = Math.round(A.x) + ':' + Math.round(A.y) + ':' + vertical;
     if (k === lureKey) return; lureKey = k;
-    lureEl.classList.add('right'); lureEl.classList.toggle('narrow', vertical);
-    lureEl.style.left = (A.x + r * .72 - 4) + 'px'; lureEl.style.top = (A.y - r * .72 + 8) + 'px';
+    lureEl.classList.add('right', 'agent'); lureEl.classList.toggle('narrow', vertical);
+    lureEl.style.left = (A.x + r * .74 - 2) + 'px'; lureEl.style.top = (A.y - r * .74 + 4) + 'px';
   }
   const parts = []; let tick = 0, slow = 1, cSig = 0, cQ = 0, cS = 0;
   const elSig = document.getElementById('cnt-sig'), elQ = document.getElementById('cnt-q'), elS = document.getElementById('cnt-sql');
@@ -305,7 +305,8 @@ import './index.css';
     if (capA > 0) {
       ctx.globalAlpha = capA; ctx.textAlign = 'center';
       ctx.fillStyle = colors.ink; ctx.font = `700 ${vertical ? 15 : 17}px "Figtree", "Helvetica Neue", sans-serif`;
-      ctx.fillText('You found it. AI & Tech Trends, my LinkedIn newsletter.', W / 2, B.y + B.size + 30, W - 32);
+      ctx.fillText('You found the secret recipe.', W / 2, B.y + B.size + 30, W - 32);
+      ctx.font = `500 ${vertical ? 13 : 15}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('AI & Tech Trends, my LinkedIn newsletter.', W / 2, B.y + B.size + 52, W - 32);
       ctx.fillStyle = colors.soft; ctx.font = `500 ${vertical ? 10 : 11}px "Geist Mono", ui-monospace, monospace`;
       ctx.fillText('SCAN TO SUBSCRIBE', W / 2, B.y - 14);
       ctx.globalAlpha = 1;
