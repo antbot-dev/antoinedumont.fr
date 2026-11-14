@@ -13,10 +13,14 @@ import './index.css';
     let ticking = false;
     const duck = () => {
       ticking = false;
-      const h = wrapEl.offsetHeight, top = wrapEl.getBoundingClientRect().top + scrollY;
-      const prog = Math.max(0, Math.min(1, scrollY / (top + h * .9)));
-      wrapEl.style.setProperty('--duck', (prog * prog * h * .62).toFixed(1) + 'px');
+      // progress starts once the whole disc is on screen, so phones see it too
+      const h = wrapEl.offsetHeight, r = wrapEl.getBoundingClientRect(), pageTop = r.top + scrollY;
+      const start = Math.min(pageTop, innerHeight - h - 16);
+      const prog = Math.max(0, Math.min(1, (start - r.top) / (h * .75)));
+      const e = Math.pow(prog, 1.5);
+      wrapEl.style.setProperty('--duck', (e * h * .93).toFixed(1) + 'px');
       wrapEl.style.setProperty('--pin-o', Math.max(0, 1 - prog * 2.4).toFixed(3));
+      wrapEl.style.setProperty('--hello', Math.max(0, Math.min(1, (prog - .45) * 2.6)).toFixed(3));
       document.getElementById('pin').style.pointerEvents = prog > .35 ? 'none' : '';
     };
     addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(duck); } }, { passive: true });
@@ -200,10 +204,13 @@ import './index.css';
   // ===== GTM engine canvas =====
   const cv = document.getElementById("engine-cv"), ctx = cv.getContext('2d');
   const sources = ['Social', 'SEO & GEO', 'Paid', 'Events', 'ABM', 'Outbound SDR'];
-  let W, H, dpr, vertical, colors = {};
+  let W, H, dpr, vertical, colors = {}, colorsReady = false;
   const nodes = {};
-  const css = n => getComputedStyle(cv).getPropertyValue(n).trim();
-  function readColors() { colors = { ink: css('--band-ink'), soft: css('--band-soft'), line: css('--band-line'), flame: css('--flame'), onFlame: css('--on-flame'), clay: css('--clay'), band: css('--band') }; }
+  // fallbacks: on a slow phone the script can run before the stylesheet applies, and an empty colour would paint everything black
+  const FALLBACK = { '--band-ink': '#f3ede2', '--band-soft': '#a89c8b', '--band-line': '#3a322a', '--flame': '#4f9dff', '--on-flame': '#04122b', '--clay': '#3d8cf2', '--band': '#1b1611' };
+  const okColor = v => { if (!v) return false; ctx.fillStyle = '#010203'; ctx.fillStyle = v; return ctx.fillStyle !== '#010203'; };
+  const css = n => { const v = getComputedStyle(cv).getPropertyValue(n).trim(); return okColor(v) ? v : FALLBACK[n]; };
+  function readColors() { colorsReady = !!getComputedStyle(cv).getPropertyValue('--band').trim(); colors = { ink: css('--band-ink'), soft: css('--band-soft'), line: css('--band-line'), flame: css('--flame'), onFlame: css('--on-flame'), clay: css('--clay'), band: css('--band') }; }
   function layout() {
     dpr = Math.min(devicePixelRatio || 1, 2);
     const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
@@ -290,6 +297,7 @@ import './index.css';
     }
   }
   function frame() {
+    if (!colorsReady) { readColors(); if (colorsReady) layout(); }
     ctx.clearRect(0, 0, W, H);
     // grid dots
     ctx.fillStyle = colors.line;
@@ -361,6 +369,9 @@ import './index.css';
   cv.addEventListener('pointerleave', () => slow = 1);
   function init() { readColors(); layout(); }
   init();
+  // re-read once the stylesheet is really in (Safari can run the module first)
+  addEventListener('load', () => { readColors(); layout(); if (reduce) frame(); });
+  addEventListener('pageshow', () => { readColors(); if (reduce) frame(); });
   // pre-warm so the first frame already shows flow
   for (let i = 0; i < 60; i++) spawn(); parts.forEach(q => q.t = Math.random() * .9);
   addEventListener('resize', () => { layout(); if (reduce) frame(); });
