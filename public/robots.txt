@@ -1,0 +1,5 @@
+# antoinedumont.fr — every crawler, search and AI assistants alike, is welcome.
+User-agent: *
+Allow: /
+
+Sitemap: https://antoinedumont.fr/sitemap.xml
