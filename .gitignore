@@ -24,3 +24,7 @@ output
 *.njsproj
 *.sln
 *.sw?
+
+# AntBot relay: key and endpoint override are written at deploy time / local tests only
+public/api/.htantbot_*
+public/api/data/

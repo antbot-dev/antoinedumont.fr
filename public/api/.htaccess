@@ -1,0 +1,9 @@
+# Only antbot.php is reachable from the web. The key file (.htantbot_key) and the
+# rate-limit counters (data/) stay private.
+Options -Indexes
+<Files "*">
+  Require all denied
+</Files>
+<Files "antbot.php">
+  Require all granted
+</Files>
