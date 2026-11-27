@@ -231,7 +231,7 @@ import './index.css';
   const lureEl = document.getElementById('lure');
   // the hint sits at the top right of the AI agents node
   function placeLure() {
-    const A = nodes.agent, r = vertical ? 46 : 58, k = Math.round(A.x) + ':' + Math.round(A.y) + ':' + vertical;
+    const A = nodes.agent, r = vertical ? 52 : 64, k = Math.round(A.x) + ':' + Math.round(A.y) + ':' + vertical;
     if (k === lureKey) return; lureKey = k;
     lureEl.classList.add('right', 'agent'); lureEl.classList.toggle('narrow', vertical);
     lureEl.style.left = (A.x + r * .74 - 2) + 'px'; lureEl.style.top = (A.y - r * .74 + 4) + 'px';
@@ -347,16 +347,18 @@ import './index.css';
     });
     // agent node
     agentPulse *= .92; salesPulse *= .9;
-    const A = nodes.agent, ar = vertical ? 46 : 58;
+    const A = nodes.agent, ar = vertical ? 52 : 64;
     ctx.beginPath(); ctx.arc(A.x, A.y, ar + agentPulse * 10, 0, Math.PI * 2); ctx.fillStyle = colors.flame; ctx.globalAlpha = .1 + agentPulse * .15; ctx.fill(); ctx.globalAlpha = 1;
     ctx.beginPath(); ctx.arc(A.x, A.y, ar, 0, Math.PI * 2); ctx.fillStyle = colors.band; ctx.fill(); ctx.strokeStyle = colors.flame; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.save(); ctx.translate(A.x, A.y); ctx.rotate(tick / 120);
     ctx.setLineDash([3, 6]); ctx.beginPath(); ctx.arc(0, 0, ar + 14, 0, Math.PI * 2); ctx.strokeStyle = colors.soft; ctx.globalAlpha = .6; ctx.stroke(); ctx.restore(); ctx.globalAlpha = 1; ctx.setLineDash([]);
     ctx.textAlign = 'center'; ctx.fillStyle = colors.ink;
-    ctx.font = `500 ${vertical ? 10 : 12}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.flameBand; ctx.fillText('GTM', A.x, A.y - (vertical ? 12 : 15));
-    ctx.fillStyle = colors.ink; ctx.font = `700 ${vertical ? 17 : 21}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('AI agents', A.x, A.y + (vertical ? 10 : 12));
+    ctx.font = `500 ${vertical ? 10 : 12}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.flameBand; ctx.fillText('GTM', A.x, A.y - (vertical ? 19 : 23));
+    ctx.fillStyle = colors.ink; ctx.font = `700 ${vertical ? 17 : 21}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('AI agents', A.x, A.y + (vertical ? 3 : 4));
+    // the human side: AI is great, but it takes a team
+    ctx.fillStyle = colors.flameBand; ctx.font = `500 ${vertical ? 10 : 12}px "Figtree", "Helvetica Neue", sans-serif`; ctx.fillText('+ my beloved team', A.x, A.y + (vertical ? 19 : 23));
     ctx.font = `500 ${vertical ? 9 : 10}px "Geist Mono", ui-monospace, monospace`; ctx.fillStyle = colors.soft;
-    ctx.fillText('RESEARCH · SCORE · FOLLOW UP', A.x, A.y + ar + 32);
+    ctx.fillText('SCORE · ENRICH · FOLLOW UP', A.x, A.y + ar + 32);
     // pipeline: starts tiny, swells with each deal, pours into the current quarter, then moves right
     const S = nodes.sales, r0 = vertical ? 9 : 11, rMax = vertical ? 42 : 54, full = FULLS[quarter];
     const target = r0 + (rMax - r0) * Math.min(held.length, MAXF) / MAXF;
@@ -415,7 +417,7 @@ import './index.css';
     tick++;
     if (!reduce) requestAnimationFrame(frame);
   }
-  const onSales = e => { const r = cv.getBoundingClientRect(), A = nodes.agent; return Math.hypot(e.clientX - r.left - A.x, e.clientY - r.top - A.y) < (vertical ? 56 : 70); };
+  const onSales = e => { const r = cv.getBoundingClientRect(), A = nodes.agent; return Math.hypot(e.clientX - r.left - A.x, e.clientY - r.top - A.y) < (vertical ? 62 : 76); };
   cv.addEventListener('click', e => { if (qrOn) setQR(false); else if (onSales(e)) setQR(true); });
   cv.addEventListener('pointermove', e => { cv.style.cursor = qrOn || onSales(e) ? 'pointer' : 'default'; });
   document.getElementById('lure').addEventListener('click', () => setQR(true));
