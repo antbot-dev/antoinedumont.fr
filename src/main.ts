@@ -60,7 +60,7 @@ import './index.css';
   });
   paint();
 
-  // ===== WhatsApp chat: working AZERTY keyboard, scripted + canned replies =====
+  // ===== WhatsApp chat: working AZERTY keyboard, scripted intro, live AntBot answers (scripted fallback) =====
   const island = document.getElementById('island');
   audio.addEventListener('play', () => island.classList.add('playing'));
   audio.addEventListener('pause', () => island.classList.remove('playing'));
@@ -94,7 +94,7 @@ import './index.css';
     kb.classList.toggle('caps', caps && layer === 'abc');
   }
   function paintField() {
-    txt.textContent = value; ph.hidden = value.length > 0; waInput.classList.toggle('has-text', value.trim().length > 0);
+    txt.textContent = value; txt.scrollLeft = txt.scrollWidth; ph.hidden = value.length > 0; waInput.classList.toggle('has-text', value.trim().length > 0);
     kb.classList.toggle('caps', caps && layer === 'abc');
   }
   function press(k) {
@@ -103,7 +103,7 @@ import './index.css';
     else if (k === 'enter') return sendMsg();
     else if (k === '123') { layer = 'num'; renderKb(); }
     else if (k === 'abc') { layer = 'abc'; renderKb(); }
-    else if ([...value].length < 70) {
+    else if ([...value].length < 200) {
       if (k === 'space') value += ' ';
       else if (k === 'emoji') value += EMOJI[Math.floor(Math.random() * EMOJI.length)];
       else { value += caps && layer === 'abc' ? k.toUpperCase() : k; caps = false; }
@@ -118,33 +118,122 @@ import './index.css';
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'Backspace') { userTouched = true; press('back'); e.preventDefault(); }
     else if (e.key === 'Enter') { userTouched = true; sendMsg(); e.preventDefault(); }
-    else if (e.key.length === 1 && [...value].length < 70) { userTouched = true; value += e.key; caps = false; paintField(); e.preventDefault(); }
+    else if (e.key.length === 1 && [...value].length < 200) { userTouched = true; value += e.key; caps = false; paintField(); e.preventDefault(); }
   });
   function addBubble(html, me) {
     const b = document.createElement('div'); b.className = 'bub' + (me ? ' me' : '');
     b.innerHTML = html + `<span class="tm">${hhmm()}${me ? TICKS : ''}</span>`;
     waBody.appendChild(b); waBody.scrollTop = waBody.scrollHeight; return b;
   }
-  const esc = t => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-  const REPLIES = [
-    'Je suis la démo d\'AntBot 🤖 Le vrai t\'envoie ton briefing audio chaque matin sur WhatsApp. <a href="https://antbot.dev/podcast/" target="_blank" rel="noreferrer">Le recevoir ↗</a>',
-    'Pour parler au vrai Antoine, c\'est tout en bas : <a href="#contact">Contact</a> 👇',
-    'Tu insistes, j\'aime bien 😏 Un secret : clique sur le point final de « works. », tout en haut.',
-    'Dernier indice : regarde le revers de sa veste 👀'
+  const esc = t => t.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // Bot text -> safe HTML: escape first, then **bold**, links and line breaks only
+  const fmtBot = t => esc(t)
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)]/g, u => `<a href="${u}" target="_blank" rel="noreferrer">${u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')} ↗</a>`)
+    .replace(/(^|[\s(])#contact\b/g, '$1<a href="#contact">Contact</a>')
+    .replace(/\n+/g, '<br>');
+
+  // ---- AntBot, live: a real LLM behind /api/antbot.php (key stays on the server), scripted fallback ----
+  const CHIPS = [
+    { q: 'C\'est quoi un agent harness ?', k: 'harness' },
+    { q: 'Ça sert à quoi pour le business ?', k: 'business' },
+    { q: 'Tes workflows GTM ?', k: 'gtm' },
+    { q: 'Le parcours d\'Antoine ?', k: 'profil' },
+    { q: 'Pourquoi le recruter ?', k: 'hire' },
+    { q: 'Comment le contacter ?', k: 'contact' }
   ];
-  let ri = 0, busy = false;
-  function botReply(html, delay) {
+  const CANNED = {
+    harness: 'Un harness, c\'est tout ce qu\'il y a autour du modèle : skills, outils, mémoire, evals, garde-fous et la boucle qui orchestre. C\'est ce qui transforme un LLM en agent qui tourne en prod, 24/7 🛠️',
+    business: 'Je fais tourner le GTM d\'Antoine : je repère les signaux d\'intent, je score et j\'enrichis les comptes, puis je pousse des alertes prêtes à l\'emploi dans Slack pour les sales. Moins de bruit, plus de bonnes conversations.',
+    gtm: 'Intent signals → scoring → enrichissement → brief dans Slack pour le commercial, avec un humain dans la boucle. Le même moteur qui aide à générer **$1M de pipeline par mois** chez Go1.',
+    profil: 'Ingénieur d\'abord, marketeur ensuite. CMO de Coorpacademy (ARR de 1M à 10M en 5 ans), aujourd\'hui Head of Marketing chez Go1, où il pilote marketing et SDR. Tout est dans le Track record, plus bas 👇',
+    hire: 'Parce qu\'il tient le chiffre ET construit les systèmes : stratégie allbound, ops, et des agents IA qui bossent vraiment. Il a mené une équipe de plusieurs personnes, il tient aujourd\'hui le même périmètre seul, augmenté par l\'IA.',
+    contact: 'Le plus simple : la section #contact tout en bas, ou LinkedIn https://fr.linkedin.com/in/antoine-dumont 👋',
+    podcast: 'Le briefing audio, c\'est une campagne qui tourne sur le harness : veille, fact-check et voix par des agents, chaque matin à 7h30 sur WhatsApp. https://antbot.dev/podcast/',
+    fallback: [
+      'Je suis le harness d\'Antoine 🤖 Demande-moi ce que je fais pour son GTM, ou son parcours.',
+      'Pour parler au vrai Antoine, c\'est tout en bas : #contact 👇',
+      'Tu insistes, j\'aime bien 😏 Un secret : clique sur le point final de « works. », tout en haut.',
+      'Dernier indice : regarde le revers de sa veste 👀'
+    ]
+  };
+  const INTENTS = [
+    [/harness|agent|skill|m[ée]moire|memory|eval|guardrail|garde|tool|outil|stack|llm|mod[eè]le/i, 'harness'],
+    [/gtm|intent|signal|scor|enrich|slack|sales|pipe|lead|abm|outbound|inbound|allbound/i, 'gtm'],
+    [/business|roi|valeur|value|sert|usage|use case|cas d/i, 'business'],
+    [/recrut|hire|embauch|pourquoi lui|why him|candidat/i, 'hire'],
+    [/contact|mail|joindre|linkedin|appel|call|rdv|meeting/i, 'contact'],
+    [/podcast|briefing|audio|veille|whatsapp/i, 'podcast'],
+    [/parcours|profil|cv|exp[ée]rience|go1|coorp|laureate|qui est|who is|antoine|background/i, 'profil']
+  ];
+  const chipsEl = document.getElementById('chips');
+  const history = [];
+  let fi = 0, busy = false, live = true;
+  function cannedFor(q) {
+    const hit = INTENTS.find(([re]) => re.test(q));
+    if (hit) return CANNED[hit[1]];
+    return CANNED.fallback[fi++ % CANNED.fallback.length];
+  }
+  function showChips() {
+    chipsEl.innerHTML = CHIPS.map((c, i) => `<button type="button" class="chip" data-i="${i}">${esc(c.q)}</button>`).join('');
+    chipsEl.hidden = false; waBody.scrollTop = waBody.scrollHeight;
+  }
+  chipsEl.addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b || busy) return;
+    userTouched = true; value = CHIPS[+b.dataset.i].q; b.remove();
+    if (!chipsEl.children.length) chipsEl.hidden = true;
+    sendMsg();
+  });
+  function typing() {
     busy = true; waState.textContent = 'écrit…';
     const t = document.createElement('div'); t.className = 'bub typing'; t.innerHTML = '<i></i><i></i><i></i>';
-    setTimeout(() => { waBody.appendChild(t); waBody.scrollTop = waBody.scrollHeight; }, 350);
-    setTimeout(() => { t.remove(); addBubble(html, false); waState.textContent = 'en ligne'; busy = false; }, delay);
+    let alive = true;
+    setTimeout(() => { if (alive) { waBody.appendChild(t); waBody.scrollTop = waBody.scrollHeight; } }, 350);
+    return () => { alive = false; t.remove(); waState.textContent = 'agent harness · en ligne'; busy = false; };
+  }
+  function botReply(html, delay) {
+    const done = typing();
+    setTimeout(() => { done(); addBubble(html, false); }, delay);
+  }
+  async function askBot(q) {
+    const done = typing(), t0 = Date.now();
+    let text = '';
+    if (live) {
+      try {
+        const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 15000);
+        const r = await fetch('/api/antbot.php', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctl.signal,
+          body: JSON.stringify({ message: q, history: history.slice(-6) })
+        });
+        clearTimeout(to);
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.reply) text = j.reply;
+        else if (j.error === 'rate') text = 'J\'ai beaucoup parlé aujourd\'hui 😅 Je repasse en mode script. Pour aller plus loin : #contact';
+        else if (j.error === 'off' || r.status === 404 || r.status === 405) live = false; // relay not deployed (local dev) or key missing
+      } catch { /* network or timeout: scripted answer below */ }
+    }
+    const fromLLM = !!text;
+    if (!text) text = cannedFor(q);
+    const wait = Math.max(0, (fromLLM ? 600 : 1400) - (Date.now() - t0));
+    setTimeout(() => {
+      done(); addBubble(fmtBot(text), false);
+      history.push({ role: 'user', content: q }, { role: 'assistant', content: text });
+      if (history.length > 12) history.splice(0, history.length - 12);
+    }, wait);
   }
   function sendMsg(scripted) {
     const v = value.trim(); if (!v || busy) return;
     const b = addBubble(esc(v), true); value = ''; caps = true; if (layer !== 'abc') { layer = 'abc'; renderKb(); } paintField();
     setTimeout(() => b.querySelector('.ticks').classList.add('read'), 650);
-    if (scripted) botReply('Avec plaisir ! À demain, 7h30 ☕', 1900);
-    else { botReply(REPLIES[ri % REPLIES.length], 1700); ri++; }
+    if (scripted) {
+      botReply('Avec plaisir ! À demain, 7h30 ☕', 1900);
+      const pitch = () => {
+        if (busy) return setTimeout(pitch, 800);
+        botReply('Au fait, ce briefing n\'est qu\'<b>une campagne</b>. Je suis le harness qui fait aussi tourner le GTM d\'Antoine : signaux d\'intent, scoring, enrichissement, alertes Slack pour les sales. Pose-moi une question 👇', 2200);
+        setTimeout(showChips, 2400);
+      };
+      setTimeout(pitch, 3300);
+    } else askBot(v);
   }
   renderKb(); paintField();
   // Scripted intro: the keyboard types "Super merci 🔥" by itself once the phone is on screen

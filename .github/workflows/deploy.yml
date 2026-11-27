@@ -6,6 +6,7 @@ name: Deploy to OVH
 #   OVH_FTP_SERVER    e.g. ftp.cluster0XX.hosting.ovh.net (the "FTP and SFTP server" in the OVH Manager)
 #   OVH_FTP_USERNAME  the login shown in the OVH Manager (SFTP must be enabled on it)
 #   OVH_FTP_PASSWORD  its password
+#   OPENROUTER_API_KEY  key for the AntBot chat on the home page (optional: without it the chat uses scripted replies)
 # Optional repository variable OVH_FTP_DIR (default "www"): the web root, relative to the home directory.
 
 on:
@@ -30,6 +31,18 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+
+      # The OpenRouter key only ever exists on the server: written next to the PHP relay as a .ht* file,
+      # which Apache never serves (plus api/.htaccess denies everything but antbot.php). Never committed.
+      - name: Add the AntBot relay key
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          if [ -n "$OPENROUTER_API_KEY" ]; then
+            printf '%s' "$OPENROUTER_API_KEY" > dist/api/.htantbot_key
+          else
+            echo "::warning::OPENROUTER_API_KEY is not set, the AntBot chat will use scripted replies"
+          fi
 
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
